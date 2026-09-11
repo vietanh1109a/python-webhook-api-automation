@@ -1,0 +1,3 @@
+"""Python Webhook & API Automation Service."""
+
+__version__ = "1.0.0"

@@ -1,0 +1,32 @@
+# Environments and Python artifacts
+.env
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+
+# Project data and export outputs
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+!data/.gitkeep
+
+exports/*.csv
+exports/*.xlsx
+!exports/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
