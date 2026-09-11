@@ -9,14 +9,14 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 class LeadWebhookPayload(BaseModel):
     """Payload schema for incoming lead webhooks."""
 
-    name: str = Field(..., min_length=1, description="Full name of the contact")
-    email: EmailStr = Field(..., description="Valid contact email address")
+    name: str = Field(..., min_length=1, max_length=255, description="Full name of the contact")
+    email: EmailStr = Field(..., max_length=255, description="Valid contact email address")
     external_id: Optional[str] = Field(
-        None, description="External reference ID from source CRM/platform"
+        None, max_length=255, description="External reference ID from source CRM/platform"
     )
-    company: Optional[str] = Field(None, description="Company or organization name")
+    company: Optional[str] = Field(None, max_length=255, description="Company or organization name")
     source: Optional[str] = Field(
-        "unknown", description="Source channel (e.g., website, shopify, facebook)"
+        "unknown", max_length=100, description="Source channel (e.g., website, shopify, facebook)"
     )
     notes: Optional[str] = Field(None, description="Initial notes or inquiry details")
 

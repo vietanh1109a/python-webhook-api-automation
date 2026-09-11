@@ -4,6 +4,7 @@ import logging
 
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.crud import create_lead, record_event
@@ -88,14 +89,45 @@ def ingest_lead_webhook(
     enrichment_provider = get_enrichment_provider()
     enrichment_res = enrichment_provider.enrich(normalized)
 
-    # 5. Persist lead
-    new_lead = create_lead(
-        db,
-        lead_data=normalized,
-        enrichment_status=enrichment_res.status,
-        enrichment_score=enrichment_res.score,
-        enrichment_segment=enrichment_res.segment,
-    )
+    # 5. Persist lead (with concurrency collision safety)
+    try:
+        new_lead = create_lead(
+            db,
+            lead_data=normalized,
+            enrichment_status=enrichment_res.status,
+            enrichment_score=enrichment_res.score,
+            enrichment_segment=enrichment_res.segment,
+        )
+    except IntegrityError:
+        db.rollback()
+        existing = find_duplicate_lead(
+            db,
+            source=normalized["source"],
+            email=normalized["email"],
+            external_id=normalized["external_id"],
+        )
+        if existing:
+            logger.info(
+                "Concurrent duplicate collision resolved for lead ID %d (source: %s)",
+                existing.id,
+                normalized["source"],
+            )
+            record_event(
+                db,
+                event_type="duplicate_detected",
+                status="duplicate",
+                lead_id=existing.id,
+                message=f"Concurrent duplicate detected via source={normalized['source']}",
+            )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "status": "duplicate",
+                    "lead_id": existing.id,
+                    "message": "Lead already exists",
+                },
+            )
+        raise
 
     # 6. Audit event: lead created
     record_event(

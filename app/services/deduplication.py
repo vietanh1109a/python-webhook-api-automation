@@ -18,7 +18,9 @@ def find_duplicate_lead(
     Check for existing duplicate lead based on deterministic priority rules:
 
     1. If external_id exists: check (source + external_id)
-    2. If external_id does not exist: check (source + normalized email)
+    2. If external_id match found => duplicate
+    3. Fallback: check (source + normalized email)
+    4. If email match found => duplicate
     """
     if external_id:
         stmt = select(Lead).where(
@@ -29,12 +31,9 @@ def find_duplicate_lead(
         if existing:
             return existing
 
-    # Fallback to source + email if external_id is absent or if no external_id match was found
-    if not external_id:
-        stmt = select(Lead).where(
-            Lead.source == source,
-            Lead.email == email,
-        )
-        return db.execute(stmt).scalars().first()
-
-    return None
+    # Fallback to source + email lookup for order-independent deduplication
+    stmt = select(Lead).where(
+        Lead.source == source,
+        Lead.email == email,
+    )
+    return db.execute(stmt).scalars().first()

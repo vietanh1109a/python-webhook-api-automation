@@ -183,7 +183,7 @@ Clone the repository and install dependencies in your Python 3.12 environment:
 
 ```bash
 # Clone repository
-git clone https://github.com/example/python-webhook-api-automation.git
+git clone https://github.com/vietanh1109a/python-webhook-api-automation.git
 cd python-webhook-api-automation
 
 # Optional: Create and activate virtual environment
@@ -340,7 +340,7 @@ ruff check .
 ---
 
 ## 19. PostgreSQL Configuration
-PostgreSQL is supported through `DATABASE_URL` configuration.
+SQLite is used and tested as the zero-configuration demo database. PostgreSQL configuration is supported through SQLAlchemy and psycopg using `DATABASE_URL`, but this portfolio project is not currently integration-tested against a live PostgreSQL instance.
 
 To connect this service to a PostgreSQL instance:
 
@@ -352,6 +352,7 @@ To connect this service to a PostgreSQL instance:
    ```bash
    DATABASE_URL=postgresql+psycopg://username:password@localhost:5432/leads_db
    ```
+   *(Note: Common prefixes like `postgresql://` and `postgres://` are automatically normalized to `postgresql+psycopg://`).*
 3. Start the server. The application automatically initializes tables upon startup via SQLAlchemy 2.0 DeclarativeBase metadata.
 
 ---

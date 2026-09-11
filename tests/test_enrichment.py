@@ -138,8 +138,10 @@ def test_webhook_ingestion_succeeds_when_enrichment_fails(
     client: TestClient, db_session: Session, monkeypatch
 ) -> None:
     """Ensure that external enrichment failure does NOT crash lead creation."""
+
     def failing_enrich(self, lead_data):
         from app.services.enrichment import EnrichmentResult
+
         return EnrichmentResult(status="failed", error="Connection refused")
 
     monkeypatch.setattr(MockEnrichmentProvider, "enrich", failing_enrich)
@@ -160,8 +162,10 @@ def test_webhook_ingestion_succeeds_when_enrichment_fails(
     assert lead.enrichment_score is None
 
     # Check enrichment_failed audit event was recorded
-    events = db_session.execute(
-        select(ProcessingEvent).where(ProcessingEvent.lead_id == lead_id)
-    ).scalars().all()
+    events = (
+        db_session.execute(select(ProcessingEvent).where(ProcessingEvent.lead_id == lead_id))
+        .scalars()
+        .all()
+    )
     event_types = [e.event_type for e in events]
     assert "enrichment_failed" in event_types

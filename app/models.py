@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -18,6 +18,10 @@ class Lead(Base):
     """Represents an ingested business lead."""
 
     __tablename__ = "leads"
+    __table_args__ = (
+        UniqueConstraint("source", "external_id", name="uq_leads_source_external_id"),
+        UniqueConstraint("source", "email", name="uq_leads_source_email"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     external_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
@@ -34,9 +38,7 @@ class Lead(Base):
         DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
     )
 
-    enrichment_status: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="pending"
-    )
+    enrichment_status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending")
     enrichment_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     enrichment_segment: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 

@@ -25,9 +25,13 @@ def record_event(
         lead_id=lead_id,
         message=message,
     )
-    db.add(event)
-    db.commit()
-    db.refresh(event)
+    try:
+        db.add(event)
+        db.commit()
+        db.refresh(event)
+    except Exception:
+        db.rollback()
+        raise
     return event
 
 
@@ -50,9 +54,13 @@ def create_lead(
         enrichment_score=enrichment_score,
         enrichment_segment=enrichment_segment,
     )
-    db.add(lead)
-    db.commit()
-    db.refresh(lead)
+    try:
+        db.add(lead)
+        db.commit()
+        db.refresh(lead)
+    except Exception:
+        db.rollback()
+        raise
 
     logger.info("Lead created with ID: %s (email: %s)", lead.id, lead.email)
     return lead

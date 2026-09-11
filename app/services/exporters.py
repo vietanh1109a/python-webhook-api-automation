@@ -15,24 +15,24 @@ def generate_leads_dataframe(db: Session) -> pd.DataFrame:
     leads = get_all_leads_for_export(db)
     records = []
     for lead in leads:
-        created_str = (
-            lead.created_at.strftime("%Y-%m-%d %H:%M:%S")
-            if lead.created_at
-            else ""
+        created_str = lead.created_at.strftime("%Y-%m-%d %H:%M:%S") if lead.created_at else ""
+        records.append(
+            {
+                "ID": lead.id,
+                "External ID": lead.external_id or "",
+                "Name": lead.name,
+                "Email": lead.email,
+                "Company": lead.company or "",
+                "Source": lead.source,
+                "Notes": lead.notes or "",
+                "Enrichment Status": lead.enrichment_status,
+                "Enrichment Score": lead.enrichment_score
+                if lead.enrichment_score is not None
+                else "",
+                "Enrichment Segment": lead.enrichment_segment or "",
+                "Created At": created_str,
+            }
         )
-        records.append({
-            "ID": lead.id,
-            "External ID": lead.external_id or "",
-            "Name": lead.name,
-            "Email": lead.email,
-            "Company": lead.company or "",
-            "Source": lead.source,
-            "Notes": lead.notes or "",
-            "Enrichment Status": lead.enrichment_status,
-            "Enrichment Score": lead.enrichment_score if lead.enrichment_score is not None else "",
-            "Enrichment Segment": lead.enrichment_segment or "",
-            "Created At": created_str,
-        })
 
     columns = [
         "ID",
@@ -106,9 +106,7 @@ def export_leads_excel(db: Session) -> bytes:
 
         # Styles
         header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
-        header_fill = PatternFill(
-            start_color="1F4E79", end_color="1F4E79", fill_type="solid"
-        )
+        header_fill = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
         thin_border = Border(
             left=Side(style="thin", color="D9D9D9"),
             right=Side(style="thin", color="D9D9D9"),

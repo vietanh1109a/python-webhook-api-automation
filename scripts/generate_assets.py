@@ -1,8 +1,10 @@
 """Generate high-resolution portfolio screenshots and workflow diagram assets."""
 
+import ctypes
+import time
 from pathlib import Path
 
-import openpyxl
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 PORTFOLIO_DIR = Path("portfolio")
@@ -18,7 +20,8 @@ def generate_api_overview_screenshot():
         page.goto("http://127.0.0.1:8000/docs", wait_until="networkidle")
         page.wait_for_selector(".swagger-ui")
 
-        page.add_style_tag(content="""
+        page.add_style_tag(
+            content="""
             body { 
                 background: #0f172a !important; 
                 padding: 24px 0 !important; 
@@ -43,7 +46,8 @@ def generate_api_overview_screenshot():
             .swagger-ui .opblock .opblock-summary-method { font-weight: 700 !important; border-radius: 6px !important; min-width: 75px !important; }
             .swagger-ui .opblock .opblock-summary-path { font-size: 15px !important; font-weight: 600 !important; }
             .swagger-ui .opblock .opblock-summary-description { font-size: 14px !important; color: #64748b !important; }
-        """)
+        """
+        )
         page.wait_for_timeout(500)
         page.screenshot(path="portfolio/01_api_overview.png", full_page=False)
         browser.close()
@@ -51,362 +55,73 @@ def generate_api_overview_screenshot():
 
 
 def generate_excel_report_screenshot():
-    """Render a polished, authentic Excel view of leads_export.xlsx."""
-    print("Generating 02_excel_report.png...")
-    wb = openpyxl.load_workbook("exports/leads_export.xlsx")
-    ws_leads = wb["Leads"]
+    """Capture real Microsoft Excel application screenshot of leads_export.xlsx."""
+    print("Capturing 02_excel_report.png using Microsoft Excel...")
+    excel_path = Path("exports/leads_export.xlsx").resolve()
+    if not excel_path.exists():
+        print("Warning: exports/leads_export.xlsx not found. Run scripts/run_demo.py first.")
+        return
 
-    lead_rows = []
-    for idx, r in enumerate(ws_leads.iter_rows(values_only=True)):
-        if idx > 0 and any(r):
-            lead_rows.append(r)
+    try:
+        import win32com.client
+        import win32con
+        import win32gui
+        import win32ui
 
-    rows_html = ""
-    for r in lead_rows[:7]:
-        seg = str(r[9]).lower()
-        badge_cls = "badge-high" if seg == "high" else ("badge-medium" if seg == "medium" else "badge-low")
-        score_str = f"{r[8]:.1f}" if isinstance(r[8], (int, float)) else str(r[8] or "")
-        rows_html += f"""
-        <tr>
-            <td style='text-align: center; color: #64748b;'>{r[0]}</td>
-            <td style='font-weight: 600;'>{r[2]}</td>
-            <td style='color: #0369a1;'>{r[3]}</td>
-            <td>{r[4] or '—'}</td>
-            <td><span style='background: #f1f5f9; padding: 2px 6px; border-radius: 4px;'>{r[5]}</span></td>
-            <td style='text-align: right; font-weight: 600;'>{score_str}</td>
-            <td><span class='badge-segment {badge_cls}'>{r[9]}</span></td>
-        </tr>
-        """
+        excel = win32com.client.Dispatch("Excel.Application")
+        excel.Visible = True
+        excel.WindowState = win32con.SW_MAXIMIZE
+        wb = excel.Workbooks.Open(str(excel_path))
+        try:
+            ws = wb.Sheets("Summary")
+            ws.Activate()
+            time.sleep(1.5)
 
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset='utf-8'>
-    <style>
-        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-        body {{
-            background: #0f172a;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            padding: 24px;
-            overflow: hidden;
-        }}
-        .window {{
-            width: 1540px;
-            height: 852px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid #334155;
-        }}
-        .title-bar {{
-            background: #107c41;
-            color: white;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            font-size: 13px;
-            font-weight: 500;
-        }}
-        .title-left {{ display: flex; align-items: center; gap: 12px; }}
-        .title-badge {{ background: #0b5a2f; padding: 2px 8px; border-radius: 4px; font-size: 11px; }}
-        .title-window-controls {{ display: flex; gap: 8px; }}
-        .win-btn {{ width: 12px; height: 12px; border-radius: 50%; display: inline-block; }}
-        .btn-close {{ background: #ef4444; }}
-        .btn-min {{ background: #eab308; }}
-        .btn-max {{ background: #22c55e; }}
+            hwnd = win32gui.FindWindow("XLMAIN", None)
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+            win32gui.SetWindowPos(hwnd, win32con.HWND_TOP, 0, 0, 1600, 900, 0)
+            time.sleep(1.0)
 
-        .ribbon {{
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 12px;
-            color: #374151;
-        }}
-        .ribbon-tab {{ padding: 4px 10px; border-radius: 4px; }}
-        .ribbon-tab.active {{ background: #ffffff; font-weight: 600; color: #107c41; border: 1px solid #e2e8f0; }}
-        
-        .formula-bar {{
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            font-size: 12px;
-            color: #4b5563;
-            gap: 12px;
-        }}
-        .cell-name {{ font-weight: 600; color: #111827; min-width: 40px; border-right: 1px solid #e2e8f0; }}
-        .formula-fx {{ color: #9ca3af; font-style: italic; font-weight: bold; }}
-        .formula-val {{ color: #1f2937; font-family: 'Consolas', monospace; }}
+            left, top, right, bot = win32gui.GetWindowRect(hwnd)
+            w = right - left
+            h = bot - top
 
-        .workspace {{
-            flex: 1;
-            display: flex;
-            background: #ffffff;
-            overflow: hidden;
-        }}
-        .panel-summary {{
-            flex: 1.1;
-            padding: 24px 28px;
-            background: #ffffff;
-            border-right: 2px solid #e2e8f0;
-            overflow: hidden;
-        }}
-        .panel-leads {{
-            flex: 1.45;
-            padding: 24px 28px;
-            background: #fafafa;
-            overflow: hidden;
-        }}
-        
-        .sheet-title {{
-            font-size: 17px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }}
-        .sheet-tag {{
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 9999px;
-        }}
+            hwnd_dc = win32gui.GetWindowDC(hwnd)
+            mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+            save_dc = mfc_dc.CreateCompatibleDC()
+            save_bitmap = win32ui.CreateBitmap()
+            save_bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
+            save_dc.SelectObject(save_bitmap)
 
-        .cards-row {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }}
-        .kpi-card {{
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }}
-        .kpi-card-title {{ font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }}
-        .kpi-card-val {{ font-size: 24px; font-weight: 700; color: #0f172a; margin-top: 4px; }}
-        .val-accent {{ color: #107c41; }}
+            ctypes.windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)
 
-        table.excel-table {{
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }}
-        table.excel-table th {{
-            background: #1f4e79;
-            color: white;
-            text-align: left;
-            padding: 8px 12px;
-            font-weight: 600;
-            border: 1px solid #1f4e79;
-        }}
-        table.excel-table td {{
-            padding: 7px 12px;
-            border: 1px solid #e2e8f0;
-            color: #334155;
-        }}
-        table.excel-table tr:nth-child(even) {{ background: #f8fafc; }}
-        .filter-glyph {{ float: right; opacity: 0.8; font-size: 10px; }}
+            bmp_info = save_bitmap.GetInfo()
+            bmp_str = save_bitmap.GetBitmapBits(True)
+            img = Image.frombuffer(
+                "RGB",
+                (bmp_info["bmWidth"], bmp_info["bmHeight"]),
+                bmp_str,
+                "raw",
+                "BGRX",
+                0,
+                1,
+            )
 
-        .badge-segment {{
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 10px;
-            text-transform: uppercase;
-        }}
-        .badge-high {{ background: #dcfce7; color: #166534; }}
-        .badge-medium {{ background: #fef9c3; color: #854d0e; }}
-        .badge-low {{ background: #f1f5f9; color: #475569; }}
+            img.save("portfolio/02_excel_report.png")
+            print("02_excel_report.png captured from Microsoft Excel successfully.")
 
-        .sheet-tabs-bar {{
-            background: #f1f5f9;
-            border-top: 1px solid #cbd5e1;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            font-size: 12px;
-        }}
-        .tabs-group {{ display: flex; gap: 4px; }}
-        .tab-btn {{
-            background: #e2e8f0;
-            color: #475569;
-            padding: 6px 16px;
-            border-radius: 6px 6px 0 0;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }}
-        .tab-btn.active {{
-            background: #ffffff;
-            color: #107c41;
-            font-weight: 700;
-            border-top: 2px solid #107c41;
-        }}
-        .status-info {{ color: #64748b; font-size: 11px; }}
-    </style>
-    </head>
-    <body>
-    <div class='window'>
-        <div class='title-bar'>
-            <div class='title-left'>
-                <span class='title-badge'>Excel</span>
-                <span>leads_export.xlsx — Python Automated Ingestion & KPI Report</span>
-            </div>
-            <div class='title-window-controls'>
-                <span class='win-btn btn-min'></span>
-                <span class='win-btn btn-max'></span>
-                <span class='win-btn btn-close'></span>
-            </div>
-        </div>
-        <div class='ribbon'>
-            <span class='ribbon-tab'>File</span>
-            <span class='ribbon-tab active'>Home</span>
-            <span class='ribbon-tab'>Insert</span>
-            <span class='ribbon-tab'>Formulas</span>
-            <span class='ribbon-tab'>Data</span>
-            <span class='ribbon-tab'>Review</span>
-            <span class='ribbon-tab'>View</span>
-            <span class='ribbon-tab'>Automate</span>
-            <span style='margin-left: auto; color: #107c41; font-weight: 600;'>AutoSave: ON</span>
-        </div>
-        <div class='formula-bar'>
-            <span class='cell-name'>B2</span>
-            <span class='formula-fx'>fx</span>
-            <span class='formula-val'>=COUNTIF(Leads!F:F, "shopify")</span>
-        </div>
-        <div class='workspace'>
-            <div class='panel-summary'>
-                <div class='sheet-title'>
-                    <span>Worksheet: Summary</span>
-                    <span class='sheet-tag'>KPI Executive View</span>
-                </div>
-                
-                <div class='cards-row'>
-                    <div class='kpi-card'>
-                        <div class='kpi-card-title'>Total Leads</div>
-                        <div class='kpi-card-val val-accent'>8</div>
-                    </div>
-                    <div class='kpi-card'>
-                        <div class='kpi-card-title'>Webhooks Received</div>
-                        <div class='kpi-card-val'>14</div>
-                    </div>
-                    <div class='kpi-card'>
-                        <div class='kpi-card-title'>Duplicates Stopped</div>
-                        <div class='kpi-card-val' style='color: #dc2626;'>6</div>
-                    </div>
-                </div>
+            win32gui.DeleteObject(save_bitmap.GetHandle())
+            save_dc.DeleteDC()
+            mfc_dc.DeleteDC()
+            win32gui.ReleaseDC(hwnd, hwnd_dc)
+        finally:
+            wb.Close(False)
+            excel.Quit()
 
-                <table class='excel-table'>
-                    <thead>
-                        <tr>
-                            <th style='width: 65%;'>Audit Metric <span class='filter-glyph'>▼</span></th>
-                            <th style='width: 35%; text-align: right;'>Count <span class='filter-glyph'>▼</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Total Leads Stored</td><td style='text-align: right; font-weight: bold;'>8</td></tr>
-                        <tr><td>Total Webhooks Received</td><td style='text-align: right; font-weight: bold;'>14</td></tr>
-                        <tr><td>Created New Leads</td><td style='text-align: right; font-weight: bold;'>8</td></tr>
-                        <tr><td>Duplicate Attempts Filtered</td><td style='text-align: right; font-weight: bold; color: #dc2626;'>6</td></tr>
-                        <tr><td>Enrichment Success</td><td style='text-align: right; font-weight: bold; color: #107c41;'>8</td></tr>
-                        <tr><td>Enrichment Failures</td><td style='text-align: right; font-weight: bold;'>0</td></tr>
-                    </tbody>
-                </table>
-
-                <div style='font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px;'>Lead Distribution by Source Channel</div>
-                <table class='excel-table'>
-                    <thead>
-                        <tr>
-                            <th style='background: #2f5597; width: 65%;'>Source Channel <span class='filter-glyph'>▼</span></th>
-                            <th style='background: #2f5597; width: 35%; text-align: right;'>Leads Captured <span class='filter-glyph'>▼</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>shopify</td><td style='text-align: right; font-weight: bold;'>2 (25.0%)</td></tr>
-                        <tr><td>website</td><td style='text-align: right; font-weight: bold;'>2 (25.0%)</td></tr>
-                        <tr><td>facebook</td><td style='text-align: right; font-weight: bold;'>2 (25.0%)</td></tr>
-                        <tr><td>referral</td><td style='text-align: right; font-weight: bold;'>1 (12.5%)</td></tr>
-                        <tr><td>unknown</td><td style='text-align: right; font-weight: bold;'>1 (12.5%)</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class='panel-leads'>
-                <div class='sheet-title'>
-                    <span>Worksheet: Leads</span>
-                    <span class='sheet-tag'>Frozen Row 1 • AutoFilter</span>
-                </div>
-                
-                <table class='excel-table'>
-                    <thead>
-                        <tr>
-                            <th style='width: 35px;'>ID</th>
-                            <th>Name <span class='filter-glyph'>▼</span></th>
-                            <th>Email <span class='filter-glyph'>▼</span></th>
-                            <th>Company <span class='filter-glyph'>▼</span></th>
-                            <th>Source <span class='filter-glyph'>▼</span></th>
-                            <th>Score <span class='filter-glyph'>▼</span></th>
-                            <th>Segment <span class='filter-glyph'>▼</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows_html}
-                    </tbody>
-                </table>
-                <div style='font-size: 11px; color: #64748b; font-style: italic;'>Showing 7 of 8 records • UTF-8 & openpyxl formatted</div>
-            </div>
-        </div>
-        
-        <div class='sheet-tabs-bar'>
-            <div class='tabs-group'>
-                <div class='tab-btn active'>📊 Summary</div>
-                <div class='tab-btn'>📋 Leads</div>
-            </div>
-            <div class='status-info'>
-                <span>Ready • Normalization: Applied • Duplicates Filtered: 6 • 100% Zoom</span>
-            </div>
-        </div>
-    </div>
-    </body>
-    </html>
-    """
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": 1600, "height": 900})
-        page.set_content(html, wait_until="networkidle")
-        page.screenshot(path="portfolio/02_excel_report.png")
-        browser.close()
-    print("02_excel_report.png generated successfully.")
+    except Exception as exc:
+        print(
+            f"Notice: Could not capture via Microsoft Excel ({exc}). Preserving existing 02_excel_report.png."
+        )
 
 
 def generate_workflow_overview_graphic():

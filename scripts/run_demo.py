@@ -42,8 +42,7 @@ def main() -> None:
     except httpx.ConnectError:
         print("\n[ERROR] Could not connect to service at http://127.0.0.1:8000")
         print(
-            "Please start the server first with: "
-            "uvicorn app.main:app --host 127.0.0.1 --port 8000"
+            "Please start the server first with: uvicorn app.main:app --host 127.0.0.1 --port 8000"
         )
         return
 
