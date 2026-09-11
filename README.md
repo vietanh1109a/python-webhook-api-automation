@@ -15,14 +15,14 @@ A lightweight Python automation service that receives lead webhooks, validates a
 
 ## Portfolio Preview
 
-| 01. Interactive REST API & Webhooks | 02. Formatted Multi-Sheet Excel Report |
-| :---: | :---: |
-| ![API Overview](portfolio/01_api_overview.png) | ![Excel Report](portfolio/02_excel_report.png) |
-
 <p align="center">
-  <b>03. End-to-End Automation Workflow</b><br>
-  <img src="portfolio/03_workflow_overview.png" alt="Workflow Overview" width="95%">
+  <b>1. Automation Workflow Overview</b><br>
+  <img src="portfolio/03_workflow_overview.png" alt="Automation Workflow Overview" width="95%">
 </p>
+
+| 2. FastAPI REST & Webhook Endpoints | 3. Generated Excel Business Report |
+| :---: | :---: |
+| ![FastAPI REST & Webhook Endpoints](portfolio/01_api_overview.png) | ![Generated Excel Business Report](portfolio/02_excel_report.png) |
 
 ---
 

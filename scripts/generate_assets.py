@@ -125,254 +125,227 @@ def generate_excel_report_screenshot():
 
 
 def generate_workflow_overview_graphic():
-    """Render a clean, professional architecture & workflow graphic."""
+    """Render a clean, high-contrast, thumbnail-optimized architecture & workflow cover."""
     print("Generating 03_workflow_overview.png...")
 
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset='utf-8'>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: #0f172a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            padding: 30px;
-            overflow: hidden;
-            color: #f8fafc;
-        }
-        .container {
-            width: 1540px;
-            height: 840px;
-            background: #1e293b;
-            border-radius: 16px;
-            border: 1px solid #334155;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            padding: 40px 50px;
-            justify-content: space-between;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 24px;
-        }
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-        }
-        .header p {
-            font-size: 16px;
-            color: #94a3b8;
-            margin-top: 6px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        .subtitle-pill {
-            display: inline-block;
-            background: #334155;
-            color: #38bdf8;
-            padding: 4px 16px;
-            border-radius: 9999px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 10px;
-            letter-spacing: 1px;
-        }
+    html = """<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: #080c14;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        padding: 30px;
+        overflow: hidden;
+        color: #f8fafc;
+    }
+    .container {
+        width: 1540px;
+        height: 840px;
+        background: #0f172a;
+        border-radius: 20px;
+        border: 1.5px solid #223249;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 42px 48px 30px 48px;
+    }
+    .header {
+        text-align: center;
+    }
+    .header h1 {
+        font-size: 52px;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+    .header .subtitle {
+        font-size: 22px;
+        color: #38bdf8;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-top: 8px;
+    }
 
-        .flow-grid {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin: auto 0;
-            padding: 20px 0;
-        }
-        .flow-step {
-            flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 22px 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            min-height: 240px;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-        }
-        .step-num {
-            position: absolute;
-            top: -12px;
-            background: #3b82f6;
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #1e293b;
-        }
-        .step-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-        .step-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f8fafc;
-            margin-bottom: 8px;
-        }
-        .step-desc {
-            font-size: 12px;
-            color: #94a3b8;
-            line-height: 1.5;
-        }
-        .arrow {
-            color: #64748b;
-            font-size: 26px;
-            font-weight: bold;
-        }
+    .workflow-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 18px 0;
+    }
+    .card {
+        flex: 1;
+        background: #172439;
+        border: 2px solid #283e5e;
+        border-radius: 18px;
+        padding: 32px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 380px;
+        justify-content: space-between;
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+    }
+    .step-tag {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.15);
+        border: 1.5px solid rgba(56, 189, 248, 0.4);
+        padding: 6px 18px;
+        border-radius: 9999px;
+        text-transform: uppercase;
+    }
+    .card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 4px 0;
+    }
+    .card-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.2;
+    }
+    .card-sub {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e2e8f0;
+        line-height: 1.4;
+        background: rgba(8, 14, 26, 0.75);
+        border: 1.5px solid #2a4163;
+        padding: 12px 14px;
+        border-radius: 10px;
+        width: 100%;
+    }
+    .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 
-        .outputs-container {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 20px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .outputs-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #f8fafc;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .outputs-title span.badge {
-            background: #10b981;
-            color: white;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-        .output-badges {
-            display: flex;
-            gap: 16px;
-        }
-        .output-item {
-            background: #1e293b;
-            border: 1px solid #475569;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-    </style>
-    </head>
-    <body>
-    <div class='container'>
-        <div class='header'>
-            <h1>Python Webhook & API Automation</h1>
-            <div class='subtitle-pill'>VALIDATE • DEDUPLICATE • ENRICH • STORE • EXPORT</div>
+    .footer {
+        text-align: center;
+        padding-top: 18px;
+        border-top: 1px solid #1e293b;
+    }
+    .footer-text {
+        font-size: 22px;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 2.5px;
+    }
+</style>
+</head>
+<body>
+<div class='container'>
+    <div class='header'>
+        <h1>Python Webhook & API Automation</h1>
+        <div class='subtitle'>Validate • Deduplicate • Process • Export</div>
+    </div>
+
+    <div class='workflow-row'>
+        <!-- Card 1 -->
+        <div class='card'>
+            <div class='step-tag'>Step 1</div>
+            <div class='card-icon'>
+                <svg width='58' height='58' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'>
+                    <circle cx='18' cy='5' r='3'></circle>
+                    <circle cx='6' cy='12' r='3'></circle>
+                    <circle cx='18' cy='19' r='3'></circle>
+                    <line x1='8.59' y1='13.51' x2='15.42' y2='17.49'></line>
+                    <line x1='15.41' y1='6.51' x2='8.59' y2='10.49'></line>
+                </svg>
+            </div>
+            <div class='card-title'>Webhook Input</div>
+            <div class='card-sub'>Forms • CRM • Shopify</div>
         </div>
 
-        <div class='flow-grid'>
-            <!-- Step 1 -->
-            <div class='flow-step'>
-                <div class='step-num'>1</div>
-                <div class='step-icon'>🌐</div>
-                <div class='step-title'>Lead Sources</div>
-                <div class='step-desc'>Website forms, Shopify orders, Facebook ads, and CRM webhooks submit JSON.</div>
-            </div>
-
-            <div class='arrow'>➔</div>
-
-            <!-- Step 2 -->
-            <div class='flow-step'>
-                <div class='step-num'>2</div>
-                <div class='step-icon'>⚡</div>
-                <div class='step-title'>FastAPI Ingestion</div>
-                <div class='step-desc'>Asynchronous POST endpoint with Pydantic validation & email format checks.</div>
-            </div>
-
-            <div class='arrow'>➔</div>
-
-            <!-- Step 3 -->
-            <div class='flow-step'>
-                <div class='step-num'>3</div>
-                <div class='step-icon'>🧹</div>
-                <div class='step-title'>Data Normalization</div>
-                <div class='step-desc'>Collapse spaces, lowercase emails & sources, convert empty strings to null.</div>
-            </div>
-
-            <div class='arrow'>➔</div>
-
-            <!-- Step 4 -->
-            <div class='flow-step'>
-                <div class='step-num'>4</div>
-                <div class='step-icon'>🛡️</div>
-                <div class='step-title'>Deduplication</div>
-                <div class='step-desc'>Deterministic match on (source + external_id) or (source + normalized email).</div>
-            </div>
-
-            <div class='arrow'>➔</div>
-
-            <!-- Step 5 -->
-            <div class='flow-step'>
-                <div class='step-num'>5</div>
-                <div class='step-icon'>✨</div>
-                <div class='step-title'>API Enrichment</div>
-                <div class='step-desc'>Lead scoring & segmentation with 3x exponential backoff retries via httpx.</div>
-            </div>
-
-            <div class='arrow'>➔</div>
-
-            <!-- Step 6 -->
-            <div class='flow-step'>
-                <div class='step-num'>6</div>
-                <div class='step-icon'>🗄️</div>
-                <div class='step-title'>SQL Persistence</div>
-                <div class='step-desc'>Committed to SQLite / PostgreSQL with persistent ProcessingEvent audit logs.</div>
-            </div>
+        <div class='arrow'>
+            <svg width='46' height='46' viewBox='0 0 24 24' fill='none' stroke='#94a3b8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'>
+                <line x1='5' y1='12' x2='19' y2='12'></line>
+                <polyline points='12 5 19 12 12 19'></polyline>
+            </svg>
         </div>
 
-        <div class='outputs-container'>
-            <div class='outputs-title'>
-                <span>Delivered Outputs & Integrations</span>
-                <span class='badge'>READY</span>
+        <!-- Card 2 -->
+        <div class='card'>
+            <div class='step-tag'>Step 2</div>
+            <div class='card-icon'>
+                <svg width='58' height='58' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'>
+                    <path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'></path>
+                    <polyline points='9 12 11 14 15 10'></polyline>
+                </svg>
             </div>
-            <div class='output-badges'>
-                <div class='output-item'><span>🔌</span> REST API (Paginated)</div>
-                <div class='output-item'><span>📊</span> Live Audit Statistics</div>
-                <div class='output-item'><span>📄</span> UTF-8 CSV Export</div>
-                <div class='output-item'><span>📈</span> Styled Multi-Sheet Excel</div>
+            <div class='card-title'>Clean & Deduplicate</div>
+            <div class='card-sub'>Validate • Normalize • Prevent duplicates</div>
+        </div>
+
+        <div class='arrow'>
+            <svg width='46' height='46' viewBox='0 0 24 24' fill='none' stroke='#94a3b8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'>
+                <line x1='5' y1='12' x2='19' y2='12'></line>
+                <polyline points='12 5 19 12 12 19'></polyline>
+            </svg>
+        </div>
+
+        <!-- Card 3 -->
+        <div class='card'>
+            <div class='step-tag'>Step 3</div>
+            <div class='card-icon'>
+                <svg width='58' height='58' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'>
+                    <ellipse cx='12' cy='5' rx='9' ry='3'></ellipse>
+                    <path d='M21 12c0 1.66-4 3-9 3s-9-1.34-9-3'></path>
+                    <path d='M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5'></path>
+                </svg>
             </div>
+            <div class='card-title'>API + SQL</div>
+            <div class='card-sub'>FastAPI • API Integration • Database</div>
+        </div>
+
+        <div class='arrow'>
+            <svg width='46' height='46' viewBox='0 0 24 24' fill='none' stroke='#94a3b8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'>
+                <line x1='5' y1='12' x2='19' y2='12'></line>
+                <polyline points='12 5 19 12 12 19'></polyline>
+            </svg>
+        </div>
+
+        <!-- Card 4 -->
+        <div class='card'>
+            <div class='step-tag'>Step 4</div>
+            <div class='card-icon'>
+                <svg width='58' height='58' viewBox='0 0 24 24' fill='none' stroke='#38bdf8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'>
+                    <rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect>
+                    <line x1='3' y1='9' x2='21' y2='9'></line>
+                    <line x1='3' y1='15' x2='21' y2='15'></line>
+                    <line x1='9' y1='3' x2='9' y2='21'></line>
+                    <line x1='15' y1='3' x2='15' y2='21'></line>
+                </svg>
+            </div>
+            <div class='card-title'>Business Outputs</div>
+            <div class='card-sub'>REST API • CSV • Excel</div>
         </div>
     </div>
-    </body>
-    </html>
+
+    <div class='footer'>
+        <div class='footer-text'>Python &nbsp;•&nbsp; FastAPI &nbsp;•&nbsp; SQLAlchemy &nbsp;•&nbsp; pandas &nbsp;•&nbsp; Excel</div>
+    </div>
+</div>
+</body>
+</html>
     """
 
     with sync_playwright() as p:
